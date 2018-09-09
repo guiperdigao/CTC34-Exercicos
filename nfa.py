@@ -27,12 +27,14 @@ class Automata():
     def concat(self,r1,r2):
         trans1 = ''.join(r1)
         trans2 = ''.join(r2)
-        if '+' in trans2:
+        n = len(trans2)
+        orig1 = trans1+trans2
+        if '+' in trans2 and n<=6:
             trans2 = '('+trans2+')'
         orig = trans1+trans2
         for origem,c  in self.nfa.items():
             for transicao,destino in self.nfa[origem].items():
-                if transicao == orig:
+                if transicao == orig or transicao == orig1:
                     aux_o = origem
                     aux_d = destino
                     aux_t = transicao
@@ -46,17 +48,23 @@ class Automata():
     def kleene(self,r1):
         trans = ''.join(r1)
         alt = '('+trans+')*'
+        alt2 = '('+alt+')'
         for origem,c  in self.nfa.items():
             for transicao,destino in self.nfa[origem].items():
-                if transicao == trans or transicao == alt:
+                print(transicao,trans)
+                if transicao == trans or transicao == alt or transicao == alt2:
                     aux_o = origem
                     aux_d = destino
                     aux_t = transicao
         n = len(aux_t)
         del self.nfa[aux_o][aux_t]
         if n == 2:
-            aux_t = aux_t[0:1] 
-        self.nfa[aux_o]['&'] = self.new
+            aux_t = aux_t[0:1]
+        else: aux_t = aux_t[1:n-2] 
+        if '&' in self.nfa[aux_o].keys():
+            self.nfa[aux_o]['e'] = self.new
+        else:
+            self.nfa[aux_o]['&'] = self.new
         if self.new not in self.nfa.keys():
             self.nfa[self.new] = {'&':aux_d}
         else: self.nfa[self.new]['&'] = aux_d
