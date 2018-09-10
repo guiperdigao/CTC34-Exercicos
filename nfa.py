@@ -168,3 +168,75 @@ for i in regex:
 afn = Automata(L)
 recursao(L)    
 print(afn.nfa)
+
+## Questao 3:
+def encontraSubs(entrada,cadeia):
+    #if type(entrada) == str:
+    #    L = []
+    #    regex = entrada
+    #    for i in regex:
+    #        L.append(i)
+    #    recursao(L)
+    #else: afn.nfa = entrada
+    CAD = []
+    for i in cadeia:
+        CAD.append(i) 
+    n = len(CAD)
+    ## Colocar nfa:
+    familia1 = (afn.nfa,'(a+b)*bb(b+a)*')
+    familia2 = (afn.nfa,'(a(b+c))*')
+    familia3 = (afn.nfa,'a*b+b*a')
+    familia4 = (afn.nfa,'a*b*c*')
+    dfa1 = {0:{'a':0,'b':2},2:{'b':1,'a':0},1:{'a':1,'b':1}}
+    dfa1_final = (1)
+    dfa2 = {0:{'a':2,'b':-1,'c':-1},2:{'b':0,'c':0,'a':-1},-1:{'a':-1,'b':-1,'c':-1}}
+    dfa2_final = (0)
+    dfa3 = {0:{'a':14,'b':15},14:{'b':1,'a':24},24:{'a':24,'b':1},15:{'a':1,'b':35},35:{'a':1,'b':35},1:{'a':-1,'b':-1},-1:{'a':-1,'b':-1}}
+    dfa3_final = (1,14,15)
+    dfa4 = {0:{'a':0,'b':1,'c':2},1:{'a':-1,'b':1,'c':2},2:{'a':-1,'b':-1,'c':2},-1:{'a':-1,'b':-1,'c':-1}}
+    dfa4_final = (0,1,2)
+    if entrada in familia1:
+        dfa = dfa1
+        finals = dfa1_final
+    elif entrada in familia2:
+        dfa = dfa2
+        finals = dfa2_final
+    elif entrada in familia3:
+        dfa = dfa3
+        finals = dfa3_final
+    elif entrada in familia4:
+        dfa = dfa4
+        finals = dfa4_final
+    lista = []
+    subcad = ''
+    prev_state = 0
+    for i in range(0,n):
+        subcad = ''
+        prev_state = 0
+        for j in range(i,n):
+            if dfa[prev_state][CAD[j]] == -1:
+                lista.append(subcad)
+                subcad = ''
+            elif type(finals) == tuple: 
+                if dfa[prev_state][CAD[j]] in finals:
+                    subcad = subcad + CAD[j]
+                    lista.append(subcad)
+                    prev_state = dfa[prev_state][CAD[j]]
+                else: 
+                    subcad = subcad + CAD[j]
+                    prev_state = dfa[prev_state][CAD[j]]
+            elif type(finals) == int: 
+                if dfa[prev_state][CAD[j]] == finals:
+                    subcad = subcad + CAD[j]
+                    lista.append(subcad)
+                    prev_state = dfa[prev_state][CAD[j]]
+                else: 
+                    subcad = subcad + CAD[j]
+                    prev_state = dfa[prev_state][CAD[j]]
+    lista = list(set(lista))
+    print(lista)
+
+
+entrada = input("Entrada:")
+cadeia = input("Cadeia principal:")
+encontraSubs(entrada,cadeia)
