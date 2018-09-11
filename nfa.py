@@ -7,6 +7,7 @@ class Automata():
         self.final = 1
         self.new = 2
         self.nfa = {0:{expression:1}}
+        self.graph = Digraph(comment='E-AFN')
     
     def union(self,r1,r2):
         trans1 = ''.join(r1)
@@ -51,7 +52,6 @@ class Automata():
         alt2 = '('+alt+')'
         for origem,c  in self.nfa.items():
             for transicao,destino in self.nfa[origem].items():
-                print(transicao,trans)
                 if transicao == trans or transicao == alt or transicao == alt2:
                     aux_o = origem
                     aux_d = destino
@@ -70,7 +70,16 @@ class Automata():
         else: self.nfa[self.new]['&'] = aux_d
         self.nfa[self.new][aux_t] = self.new
         self.new = self.new+1
-
+    
+    def generateFormat(self):
+        for origem, caminho in self.nfa.items():
+            self.graph.node(str(origem),str(origem), shape='circle')
+        self.graph.node('1','1', shape='doublecircle')
+        for origem, caminho in self.nfa.items():
+            for transicao,destino in self.nfa[origem].items():
+                if transicao == 'e':
+                    self.graph.edge(str(origem),str(destino), label = '&')
+                else: self.graph.edge(str(origem),str(destino), label = transicao)
 
 def recursao(expr):
     r1 = []
@@ -151,9 +160,7 @@ def recursao(expr):
                 if count == 0:
                     r1 = expr[0:i+1]
                     r2 = expr[i+1:n]
-                    print(r1,'----',r2)
                     afn.concat(r1,r2)
-                    print(afn.nfa)
                     recursao(r1)
                     recursao(r2)
                     testa = 0
@@ -168,6 +175,8 @@ for i in regex:
 afn = Automata(L)
 recursao(L)    
 print(afn.nfa)
+afn.generateFormat()
+print(afn.graph.source)
 
 ## Questao 3:
 def encontraSubs(entrada,cadeia):
